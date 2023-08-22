@@ -4,8 +4,8 @@ import selenium
 import shutil
 import sqlite3
 import requests
+from requests_html import HTMLSession
 from bs4 import BeautifulSoup
-from Dependencias import functionScrap
 
 import datetime
 #datab = sqlite3.connect('db/registroLeiloes.db')
@@ -16,10 +16,7 @@ import datetime
 #    pass
 
 
-userAgent = {"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"}
-link = "http://200.198.139.228/leiloeiros/busca/listar"
-
-###### valores
+###### Variavies que servirao ao db
 matricula = 0
 nome = " "
 situacao = False
@@ -30,15 +27,47 @@ cidade = " "
 email = " "
 telefone = " "
 preposto = " "
+atoCancelamento = " "
 motivoCancelamento = " "
 
-requisicao = requests.get(link, headers=userAgent) # Faz requisicao do site usando um userAgent
+cont = 0
 
-site = BeautifulSoup(requisicao.text,"html.parser") # 'Parseia' o html e transforma a requisicao em texto para comecar a trabalhar em cima das informacoes.
-print(site.prettify())
+s = HTMLSession()
+userAgent = {"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"}
+link = "http://200.198.139.228/leiloeiros/busca/"
+#requisicao = requests.get(link, headers=userAgent) # Faz requisicao do site usando um userAgent
 
-leiloeiros = site.findAll('b')
-print(leiloeiros)
+requisicao = open("../Portal de Serviços - JUCISRS.html", 'r')
+soup = BeautifulSoup(requisicao,'html.parser')
+#print(requisicaoResult.prettify())
+
+
+listaElementos = soup.find_all('b')
+for elemento in listaElementos:
+    elementFont = elemento.findAll('font')
+    for font in elementFont:
+        if font:
+            entry_number = font.text.strip()
+            try:
+                name = font.next_sibling.strip()# Extract name
+            except:
+                name =  " "
+                pass
+            # Print or process the extracted information
+            ##print("Name:", name)
+            #print("**     \n\n    **")
+    elementBr = elemento.findAll('br')
+    cont = 0
+    for br in elementBr:
+
+        if br:
+
+            cidade = br.next_sibling.strip()
+
+            print(cidade)
+#leiloeirosLista = site.findAll("option")
+#for x in leiloeirosLista:
+#    print(x)
 
 
 
