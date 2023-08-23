@@ -17,9 +17,9 @@ import datetime
 
 
 ###### Variavies que servirao ao db
-matricula = 0
+#matricula = ""
 nome = " "
-situacao = False
+situacao = 0
 endereco = " "
 cep = " "
 cidade = " "
@@ -41,30 +41,64 @@ requisicao = open("../Portal de Serviços - JUCISRS.html", 'r')
 soup = BeautifulSoup(requisicao,'html.parser')
 #print(requisicaoResult.prettify())
 
+## As infos estao separadas entre uma linha visual na tela, conhecida como <hr>, estou tentando separar tudo entre elas
+# e assim trabalhar com as informacoes dentro dela, a matricula retira-se do texto
 
-listaElementos = soup.find_all('b')
-for elemento in listaElementos:
-    elementFont = elemento.findAll('font')
-    for font in elementFont:
+tagHRs = str(soup.findAll('hr'))
+
+#print(tagB)
+listaDeEntradas = []
+for hr in tagHRs:
+    href = "Sem link"
+    hr = hr.find_next()
+    #print(hr)
+    for a in hr.findAll('a', href=True):
+        if a:
+            href = a['href']
+        else:
+            href = "Sem link"
+
+    situacao = 0
+
+    hrFont = hr.findAll('font')
+    hrBolt = hr.findAll('b')
+
+    for font in hrFont:
+
         if font:
-            entry_number = font.text.strip()
-            try:
-                name = font.next_sibling.strip()# Extract name
-            except:
-                name =  " "
-                pass
-            # Print or process the extracted information
-            ##print("Name:", name)
-            #print("**     \n\n    **")
-    elementBr = elemento.findAll('br')
-    cont = 0
-    for br in elementBr:
 
-        if br:
+            matricula = font.text.strip()
+            nome = font.next_sibling.strip().replace("- ", "")
 
-            cidade = br.next_sibling.strip()
+            if "(Cancelado)" in matricula:
+                matricula.replace("(Cancelado)", "")
+                nome.replace("(Cancelado)", "")
+                situacao = 1
+            elif "(Suspenso)" in matricula:
+                matricula.replace("(Suspenso)", "")
+                nome.replace("(Suspenso)", "")
+                situacao = 2
 
-            print(cidade)
+            # print("   ``   ")
+            print("Nome: ", nome)
+            print("Matricula : ",matricula)
+            print("situacao : ",situacao)
+            # print("   ``   ")
+            print(href)
+
+    bold_tags = soup.find_all('b')
+
+
+    try:
+        texto = hr.find_next().get_text(strip=True)
+    except:
+        pass
+    listaDeEntradas.append(texto)
+
+# Print the extracted text entries
+for entrada in listaDeEntradas:
+    #print(entrada)
+    pass
 #leiloeirosLista = site.findAll("option")
 #for x in leiloeirosLista:
 #    print(x)
