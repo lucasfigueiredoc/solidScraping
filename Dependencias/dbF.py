@@ -1,6 +1,5 @@
 import sqlite3
 
-
 datab = sqlite3.connect('db/registroLeiloes.db')
 cursor = datab.cursor()
 def createTable():

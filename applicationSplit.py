@@ -1,35 +1,19 @@
 
-from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 from datetime import datetime
 from Dependencias.dbF import *
-
-from selenium.webdriver.chrome.options import Options
 import re
-import time
-createTable()
-options = Options()
 
-s = HTMLSession()
-userAgent = \
-    {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"}
-link = "http://200.198.139.228/leiloeiros/busca/"
-# requisicao = requests.get(link, headers=userAgent) # Faz requisicao do site usando um userAgent
-
-requisicao = open("Dependencias/Portal de Serviços - JUCISRS.html", 'r')
-soup = str(BeautifulSoup(requisicao, 'html.parser'))
+createTable() ## função para criar tabela onde serão registrados os leiloeiros
+requisicao = open("Dependencias/Portal de Serviços - JUCISRS.html", 'r') ## leitura do arquivo que vai ser raspado
+soup = str(BeautifulSoup(requisicao, 'html.parser')) ## o converto para str,
 # print(requisicaoResult.prettify())
 
-## As infos estao separadas entre uma linha visual na tela, conhecida como <hr>, estou tentando separar tudo entre elas
-# e assim trabalhar com as informacoes dentro dela, a matricula retira-se do texto
+splitHRs = soup.split('<hr/>') ## separo todas as <hr> encontradas, entre as elas se encontra as infos dos leiloeiros
 
-splitHRs = soup.split('<hr/>')
-cont = 0
-print(len(splitHRs))
+for x in range(4, len(splitHRs) - 2): ## A partir do hr 4 e até o antepenúltimo ficam as informações que preciso, os outros fazem parte da estilização do site.
 
-for x in range(4, len(splitHRs) - 2):
-
-    ##Variáveis que precisam ser inicializadas e reiniciadas com valores padrão antes de cada ciclo
+    ##Variáveis que precisam ser inicializadas e reiniciadas com valores padrão antes de cada ciclo.
     bloco = splitHRs[x] ###### Bloco se refere a parte do código onde se renderiza as informações de cada leiloeiro
     dataPosse = ""
     dataTxt = ""
@@ -42,30 +26,34 @@ for x in range(4, len(splitHRs) - 2):
     motivo = "Não foi cancelado"
 
 
-
     #### Com cada bloco transformado em str, se inicia o fatiamento utilizando referências em que se precede cada dado específico
+
     ############## Encontrar Nome
     inicio = bloco.find("-") ## cada nome é precedido de um ifem
     fim = bloco.find('<', inicio)
     nome = bloco[inicio + 1:fim]
     # %
+
     ############# Encontrar matricula
     inicio = bloco.find('<font color="#A01A14">') ## matricula precedida por esta estrutura css
     fim = bloco.find('</', inicio)
     matricula = bloco[inicio + 22:fim]
     # %
+
     ##### Verifica situação no bloco atual
     if "(Cancelado)" in bloco:
         situacao = "Cancelado"
     elif "(Suspenso)" in bloco:
         situacao = "Suspenso"
     # %
+
     ############# Motivo do cancelamento
     if 'Motivo do Cancelamento: ' in bloco:
         inicio = bloco.find('Motivo do Cancelamento: ')
         fim = bloco.find('')
         motivo = bloco[inicio+23:]
     # %
+
     ############# Encontrar site
     if '<a href="' in bloco:
         inicio = bloco.find('<a href="')
@@ -74,18 +62,21 @@ for x in range(4, len(splitHRs) - 2):
     else:
         site = "sem endereco"
     # %
+
     ############# Encontrar preposto
     if 'Preposto : ' in bloco:
         inicio = bloco.find('Preposto : ')
         fim = bloco.find('<', inicio)
         preposto = bloco[inicio + 9:fim]
     # %
+
     ############# Encontrar email
     if 'e-Mail : ' in bloco:
         inicio = bloco.find('e-Mail : ')
         fim = bloco.find('<', inicio)
         email = bloco[inicio + 8:fim]
     # %
+
     ############# Encontrar data
     strData = re.search(r'\d{2}/\d{2}/\d{4}', bloco) ### estrutura regular do formato de data
     try:
@@ -94,6 +85,7 @@ for x in range(4, len(splitHRs) - 2):
     except:
         pass
     # %
+
     ############# Encontrar endereco
     varEndereco = str(dataTxt + '<br/>')
     if varEndereco in bloco:
@@ -102,6 +94,7 @@ for x in range(4, len(splitHRs) - 2):
         endereco = bloco[inicio + 14:fim]
         if "<a href=" in endereco:
             endereco = "Endereço não registrado"
+    # %
 
     ############# Encontrar cidade
     padrao = r"<br/>\s*(.*?) - RS"
@@ -112,7 +105,7 @@ for x in range(4, len(splitHRs) - 2):
             cidade = palavra_anterior.replace('<b>', '')
         else:
             print("Cidade nao encontrada")
-            cidade = " nulo "
+            cidade = " Sem registro "
     # %
 
     ########### Encontrar telefone
@@ -140,5 +133,3 @@ for x in range(4, len(splitHRs) - 2):
         print("comitado")
     except Exception as e:
         print(f"An exception occurred: {str(e)}")
-        print("Por algum motivo nao ocorreu commit")
-
