@@ -3,18 +3,12 @@ from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 from datetime import datetime
 from Dependencias.dbF import *
-#mport selenium
-#from selenium import webdriver
+
 from selenium.webdriver.chrome.options import Options
 import re
 import time
 createTable()
 options = Options()
-import os
-
-#drive = webdriver.Chrome('chromedriver.')
-#drive.get('http://200.198.139.228/leiloeiros/busca/')
-#time.sleep(5)
 
 s = HTMLSession()
 userAgent = \
@@ -45,12 +39,9 @@ for x in range(4, len(splitHRs) - 2):
     preposto = "Não registrado"
     cidade = "Não registrado"
     situacao = "Ativo(a)"
+    motivo = "Não foi cancelado"
 
-    ##### Verifica situação no bloco atual
-    if "(Cancelado)" in bloco:
-        situacao = "Cancelado"
-    elif "(Suspenso)" in bloco:
-        situacao = "Suspenso"
+
 
     #### Com cada bloco transformado em str, se inicia o fatiamento utilizando referências em que se precede cada dado específico
     ############## Encontrar Nome
@@ -62,6 +53,18 @@ for x in range(4, len(splitHRs) - 2):
     inicio = bloco.find('<font color="#A01A14">') ## matricula precedida por esta estrutura css
     fim = bloco.find('</', inicio)
     matricula = bloco[inicio + 22:fim]
+    # %
+    ##### Verifica situação no bloco atual
+    if "(Cancelado)" in bloco:
+        situacao = "Cancelado"
+    elif "(Suspenso)" in bloco:
+        situacao = "Suspenso"
+    # %
+    ############# Motivo do cancelamento
+    if 'Motivo do Cancelamento: ' in bloco:
+        inicio = bloco.find('Motivo do Cancelamento: ')
+        fim = bloco.find('')
+        motivo = bloco[inicio+23:]
     # %
     ############# Encontrar site
     if '<a href="' in bloco:
@@ -129,10 +132,11 @@ for x in range(4, len(splitHRs) - 2):
     print("Cidade: ", cidade)
     print("telefone: ", telefone)
     print("Endereço :",endereco)
+    print("Motivo: ", motivo)
     print("******************************************************")
 
     try:
-        input(nome, matricula, site, dataPosse, email, preposto, situacao, cidade, telefone, endereco)
+        input(nome, matricula, site, dataPosse, email, preposto, situacao, motivo, cidade, telefone, endereco.replace('>',''))
         print("comitado")
     except Exception as e:
         print(f"An exception occurred: {str(e)}")
