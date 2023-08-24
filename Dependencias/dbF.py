@@ -11,7 +11,7 @@ def createTable():
                 nome TEXT,
                 matricula INTEGER,
                 site TEXT,
-                data DATE,
+                posse DATE,
                 email TEXT,
                 preposto TEXT,
                 situacao TEXT,
@@ -25,6 +25,6 @@ def createTable():
         pass
 
 def input(nome, matricula, site, dataPosse, email, preposto, situacao, cidade, telefone, endereco):
-    query = "INSERT INTO leiloeiros(nome, matricula, site, data, email, preposto, situacao, cidade, telefone, endereco) VALUES ('{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');".format(nome, matricula, site, dataPosse, email, preposto, situacao, cidade, telefone, endereco)
+    query = "INSERT INTO leiloeiros(nome, matricula, site, posse, email, preposto, situacao, cidade, telefone, endereco) VALUES ('{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');".format(nome, matricula, site, dataPosse, email, preposto, situacao, cidade, telefone, endereco)
     cursor.execute(query)
     datab.commit()

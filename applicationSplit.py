@@ -35,28 +35,31 @@ print(len(splitHRs))
 
 for x in range(4, len(splitHRs) - 2):
 
-    bloco = splitHRs[x]
+    ##Variáveis que precisam ser inicializadas e reiniciadas com valores padrão antes de cada ciclo
+    bloco = splitHRs[x] ###### Bloco se refere a parte do código onde se renderiza as informações de cada leiloeiro
     dataPosse = ""
     dataTxt = ""
-    endereco = "Endereco sem registro"
+    endereco = "Endereço não registrado"
     telefone = "Sem registro"
     email = "Sem registro"
     preposto = "Não registrado"
     cidade = "Não registrado"
-
     situacao = "Ativo(a)"
+
+    ##### Verifica situação no bloco atual
     if "(Cancelado)" in bloco:
         situacao = "Cancelado"
     elif "(Suspenso)" in bloco:
         situacao = "Suspenso"
 
+    #### Com cada bloco transformado em str, se inicia o fatiamento utilizando referências em que se precede cada dado específico
     ############## Encontrar Nome
-    inicio = bloco.find("-")
+    inicio = bloco.find("-") ## cada nome é precedido de um ifem
     fim = bloco.find('<', inicio)
     nome = bloco[inicio + 1:fim]
     # %
     ############# Encontrar matricula
-    inicio = bloco.find('<font color="#A01A14">')
+    inicio = bloco.find('<font color="#A01A14">') ## matricula precedida por esta estrutura css
     fim = bloco.find('</', inicio)
     matricula = bloco[inicio + 22:fim]
     # %
@@ -81,7 +84,7 @@ for x in range(4, len(splitHRs) - 2):
         email = bloco[inicio + 8:fim]
     # %
     ############# Encontrar data
-    strData = re.search(r'\d{2}/\d{2}/\d{4}', bloco)
+    strData = re.search(r'\d{2}/\d{2}/\d{4}', bloco) ### estrutura regular do formato de data
     try:
         dataPosse = datetime.strptime(strData.group(), '%d/%m/%Y').date()
         dataTxt = dataPosse.strftime('%d/%m/%Y')
@@ -94,6 +97,8 @@ for x in range(4, len(splitHRs) - 2):
         inicio = bloco.find(varEndereco)
         fim = bloco.find('</b>', inicio)
         endereco = bloco[inicio + 14:fim]
+        if "<a href=" in endereco:
+            endereco = "Endereço não registrado"
 
     ############# Encontrar cidade
     padrao = r"<br/>\s*(.*?) - RS"
@@ -106,12 +111,12 @@ for x in range(4, len(splitHRs) - 2):
             print("Cidade nao encontrada")
             cidade = " nulo "
     # %
+
     ########### Encontrar telefone
     if 'Telefone : ' in bloco:
         inicio = bloco.find('Telefone : ')
         fim = bloco.find('<br/>', inicio)
         telefone = bloco[inicio + 10:fim].strip()
-    bloco.find(' ah ze da manga')
     # %
 
     print("Nome: ", nome)
@@ -123,7 +128,7 @@ for x in range(4, len(splitHRs) - 2):
     print("Situação: ", situacao)
     print("Cidade: ", cidade)
     print("telefone: ", telefone)
-    print(endereco)
+    print("Endereço :",endereco)
     print("******************************************************")
 
     try:
